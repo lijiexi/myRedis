@@ -1,0 +1,14 @@
+target/
+*.jar
+*.war
+*.zip
+*.tar
+*.tar.gz
+
+.idea/
+*.ipr
+*.iml
+*.iws
+
+.DS_Store
+Thumbs.db
