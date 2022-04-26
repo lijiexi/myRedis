@@ -69,7 +69,9 @@ public class CacheBs<K, V> {
         cache.map(map);
         cache.evict(evict);
         cache.sizeLimit(size);
+        //调用cache初始化，删除策略等
+        cache.init();
         return cache;
-        //TODO cache.init()
+
     }
 }

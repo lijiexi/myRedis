@@ -3,10 +3,13 @@ package com.ljx.myRedis.core;
 import com.ljx.myRedis.api.ICache;
 import com.ljx.myRedis.api.ICacheEntry;
 import com.ljx.myRedis.api.ICacheEvict;
+import com.ljx.myRedis.api.ICacheExpire;
 import com.ljx.myRedis.core.exception.CacheRuntimeException;
 import com.ljx.myRedis.core.support.evict.CacheEvictContext;
+import com.ljx.myRedis.core.support.expire.CacheExpire;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,6 +28,10 @@ public class Cache<K, V> implements ICache<K, V> {
      */
     private ICacheEvict<K, V> evict;
 
+    /**
+     * 过期策略
+     */
+    private ICacheExpire<K, V> expire;
 
     /**
      * 设置map实现
@@ -53,6 +60,36 @@ public class Cache<K, V> implements ICache<K, V> {
     public ICacheEvict<K, V> evict() {
         return this.evict;
     }
+
+    /**
+     * 初始化cache 被cacheBS调用
+     */
+    public void init () {
+        this.expire = new CacheExpire<>(this);
+    }
+    /**
+     * n毫秒后过期
+     * @param key key
+     * @param timeInMills timeInMills毫秒后过期
+     * @return this
+     */
+    public ICache<K, V> expire (final K key, final long timeInMills) {
+        long expireTime = System.currentTimeMillis() + timeInMills;
+        return expireAt(key, expireTime);
+    }
+
+    /**
+     * 指定时间过期
+     * @param key key
+     * @param timeInMills 时间戳
+     * @return
+     */
+    public ICache<K, V> expireAt (final K key, final long timeInMills) {
+        this.expire.expire(key,timeInMills);
+        return this;
+    }
+
+
     /**
      * 返回当前map已使用的大小
      */
@@ -78,8 +115,10 @@ public class Cache<K, V> implements ICache<K, V> {
 
     @Override
     public V get(Object key) {
-        //TODO 刷新所有过期时间
-
+        //惰性删除 刷新所有过期时间
+        K genericKey = (K) key;
+        //创建不可变List的单个元素
+        this.expire.refreshExpire(Collections.singletonList(genericKey));
         return map.get(key);
     }
 
