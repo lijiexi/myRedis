@@ -156,4 +156,9 @@ public class CacheExpireSort<K, V> implements ICacheExpire<K, V> {
             }
         }
     }
+
+    @Override
+    public Long expireTime(K key) {
+        return expireMap.get(key);
+    }
 }

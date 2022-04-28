@@ -1,6 +1,9 @@
 package com.ljx.myRedis.core.bs;
 
 import com.ljx.myRedis.api.ICache;
+import com.ljx.myRedis.core.load.MyCacheLoad;
+import com.ljx.myRedis.core.support.load.CacheLoads;
+import com.ljx.myRedis.core.support.persist.CachePersists;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,4 +44,42 @@ public class CacheBsTest {
         System.out.println(cache.keySet());
         Assert.assertEquals(2, cache.size());
     }
+    /**
+     * load加载接口测试
+     */
+    @Test
+    public void loadTest () {
+        ICache<String,String> cache = CacheBs.<String,String>newInstance()
+                .size(2).load(new MyCacheLoad()).build();
+        Assert.assertEquals(2, cache.size());
+        System.out.println(cache.entrySet());
+    }
+    /**
+     * rdb持久化测试
+     */
+    @Test
+    public void persistRdb () throws InterruptedException {
+        ICache<String,String> cache = CacheBs.<String,String>newInstance()
+                .load(new MyCacheLoad())
+                .persist(CachePersists.dbJson("test.rdb")).build();
+        Assert.assertEquals(2, cache.size());
+        TimeUnit.MINUTES.sleep(3);
+    }
+    /**
+     * rdb加载测试
+     */
+    @Test
+    public void loadRdb () throws InterruptedException {
+        ICache<String,String> cache = CacheBs.<String,String>newInstance()
+                .size(3).load(CacheLoads.dbJson("rdb.txt"))
+                .persist(CachePersists.dbJson("rdb.txt"))
+                .build();
+        cache.put("5","5");
+        cache.expire("5",1);
+        cache.put("6","6");
+        System.out.println(cache.entrySet());
+        TimeUnit.MINUTES.sleep(3);
+        System.out.println(cache.entrySet());
+    }
+
 }

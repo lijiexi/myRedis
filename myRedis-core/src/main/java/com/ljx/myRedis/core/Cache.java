@@ -1,12 +1,10 @@
 package com.ljx.myRedis.core;
 
-import com.ljx.myRedis.api.ICache;
-import com.ljx.myRedis.api.ICacheEntry;
-import com.ljx.myRedis.api.ICacheEvict;
-import com.ljx.myRedis.api.ICacheExpire;
+import com.ljx.myRedis.api.*;
 import com.ljx.myRedis.core.exception.CacheRuntimeException;
 import com.ljx.myRedis.core.support.evict.CacheEvictContext;
 import com.ljx.myRedis.core.support.expire.CacheExpire;
+import com.ljx.myRedis.core.support.persist.InnerCachePersist;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +31,14 @@ public class Cache<K, V> implements ICache<K, V> {
      */
     private ICacheExpire<K, V> expire;
 
+    /**
+     * 加载类
+     */
+    private ICacheLoad<K,V> load;
+    /**
+     * 持久化
+     */
+    private ICachePersist<K,V> persist;
     /**
      * 设置map实现
      */
@@ -62,10 +68,34 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     /**
+     * 设置持久化策略
+     */
+    public void persist (ICachePersist<K,V> persist) {
+        this.persist = persist;
+    }
+    @Override
+    public ICacheLoad<K, V> load() {
+        return load;
+    }
+    /**
+     * 设置加载策略
+     */
+    public Cache<K, V> load (ICacheLoad<K, V> load) {
+        this.load = load;
+        return this;
+    }
+
+    /**
      * 初始化cache 被cacheBS调用
      */
     public void init () {
         this.expire = new CacheExpire<>(this);
+        //进行加载策略load
+        this.load.load(this);
+        //初始化持久策略，每10分钟进行一侧
+        if (this.persist != null) {
+            new InnerCachePersist<>(this,persist);
+        }
     }
     /**
      * n毫秒后过期
@@ -89,6 +119,10 @@ public class Cache<K, V> implements ICache<K, V> {
         return this;
     }
 
+    @Override
+    public ICacheExpire<K, V> expire() {
+        return this.expire;
+    }
 
     /**
      * 返回当前map已使用的大小
