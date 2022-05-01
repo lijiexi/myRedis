@@ -1,15 +1,16 @@
 package com.ljx.myRedis.core;
 
+import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.ljx.myRedis.api.*;
+import com.ljx.myRedis.core.constant.enums.CacheRemoveType;
 import com.ljx.myRedis.core.exception.CacheRuntimeException;
 import com.ljx.myRedis.core.support.evict.CacheEvictContext;
 import com.ljx.myRedis.core.support.expire.CacheExpire;
+import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListener;
+import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListenerContext;
 import com.ljx.myRedis.core.support.persist.InnerCachePersist;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Cache<K, V> implements ICache<K, V> {
     /**
@@ -30,6 +31,10 @@ public class Cache<K, V> implements ICache<K, V> {
      * 过期策略
      */
     private ICacheExpire<K, V> expire;
+    /**
+     * 删除监听类
+     */
+    private List<ICacheRemoveListener<K,V>> removeListeners;
 
     /**
      * 加载类
@@ -77,6 +82,16 @@ public class Cache<K, V> implements ICache<K, V> {
     public ICacheLoad<K, V> load() {
         return load;
     }
+
+    @Override
+    public List<ICacheRemoveListener<K, V>> removeListeners() {
+        return removeListeners;
+    }
+    public Cache<K,V> removeListeners (List<ICacheRemoveListener<K,V>> removeListeners) {
+        this.removeListeners = removeListeners;
+        return this;
+    }
+
     /**
      * 设置加载策略
      */
@@ -163,6 +178,16 @@ public class Cache<K, V> implements ICache<K, V> {
         context.key(key).size(sizeLimit).cache(this);
         //返回驱逐后明细信息
         ICacheEntry<K, V> evictEntry = evict.evict(context);
+        //此时有kv被淘汰，触发所有删除监听器
+        if (ObjectUtil.isNotNull(evictEntry)) {
+            ICacheRemoveListenerContext<K,V> removeListenerContext = CacheRemoveListenerContext.<K,V>newInstance()
+                    .key(evictEntry.key()).value(evictEntry.value())
+                    .type(CacheRemoveType.EVICT.code());
+            //遍历所有删除监听器，依次触发
+            for (ICacheRemoveListener<K,V> listener : context.cache().removeListeners()) {
+                listener.listen(removeListenerContext);
+            }
+        }
         //2 判断驱逐后信息
         if (isSizeLimit()) {
             throw new CacheRuntimeException("队列已满，添加数据失败！");

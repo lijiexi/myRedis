@@ -2,6 +2,10 @@ package com.ljx.myRedis.core.support.expire;
 
 import com.ljx.myRedis.api.ICache;
 import com.ljx.myRedis.api.ICacheExpire;
+import com.ljx.myRedis.api.ICacheRemoveListener;
+import com.ljx.myRedis.api.ICacheRemoveListenerContext;
+import com.ljx.myRedis.core.constant.enums.CacheRemoveType;
+import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListenerContext;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -94,7 +98,14 @@ public class CacheExpire<K, V> implements ICacheExpire<K, V> {
         if (currentTime >= expireAt) {
             expireMap.remove(key);
             //移除缓存中kv
-            cache.remove(key);
+            V removeValue = cache.remove(key);
+            //执行淘汰监听器
+            ICacheRemoveListenerContext<K,V> removeListenerContext = CacheRemoveListenerContext.<K,V>newInstance()
+                    .key(key).value(removeValue).type(CacheRemoveType.EXPIRE.code());
+            //调用所有删除监听器
+            for (ICacheRemoveListener<K,V> listener : cache.removeListeners()) {
+                listener.listen(removeListenerContext);
+            }
         }
     }
 

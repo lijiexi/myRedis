@@ -1,15 +1,15 @@
 package com.ljx.myRedis.core.bs;
 
-import com.ljx.myRedis.api.ICache;
-import com.ljx.myRedis.api.ICacheEvict;
-import com.ljx.myRedis.api.ICacheLoad;
-import com.ljx.myRedis.api.ICachePersist;
+import com.github.houbb.heaven.util.common.ArgUtil;
+import com.ljx.myRedis.api.*;
 import com.ljx.myRedis.core.Cache;
 import com.ljx.myRedis.core.support.evict.CacheEvicts;
+import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListeners;
 import com.ljx.myRedis.core.support.load.CacheLoads;
 import com.ljx.myRedis.core.support.persist.CachePersists;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +40,11 @@ public class CacheBs<K, V> {
      */
     private ICacheEvict<K, V> evict = CacheEvicts.fifo();
 
+    /**
+     * 删除监听类 可以添加多个
+     * 默认使用默认删除监听器
+     */
+    private final List<ICacheRemoveListener<K,V>> removeListeners = CacheRemoveListeners.defaults();
     /**
      * 加载策略 默认none
      */
@@ -84,6 +89,17 @@ public class CacheBs<K, V> {
         this.load = load;
         return this;
     }
+
+    /**
+     * 添加删除监听器
+     * @param removeListener 监听器
+     * @return this
+     */
+    public CacheBs<K,V> addRemoveListener (ICacheRemoveListener<K,V> removeListener) {
+        ArgUtil.notNull(removeListener,"removeListener");
+        this.removeListeners.add(removeListener);
+        return this;
+    }
     /**
      * 设置持久化策略
      */
@@ -99,6 +115,7 @@ public class CacheBs<K, V> {
         cache.map(map);
         cache.evict(evict);
         cache.sizeLimit(size);
+        cache.removeListeners(removeListeners);
         cache.load(load);
         cache.persist(persist);
         //调用cache初始化，删除策略等

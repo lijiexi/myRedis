@@ -1,7 +1,10 @@
 package com.ljx.myRedis.core.bs;
 
 import com.ljx.myRedis.api.ICache;
+import com.ljx.myRedis.core.listener.MyRemoveListener;
 import com.ljx.myRedis.core.load.MyCacheLoad;
+import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListener;
+import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListeners;
 import com.ljx.myRedis.core.support.load.CacheLoads;
 import com.ljx.myRedis.core.support.persist.CachePersists;
 import org.junit.Assert;
@@ -81,5 +84,15 @@ public class CacheBsTest {
         TimeUnit.MINUTES.sleep(3);
         System.out.println(cache.entrySet());
     }
-
+    /**
+     * 删除监听器测试
+     */
+    @Test
+    public void removeListenersTest () {
+        ICache<String,String> cache = CacheBs.<String,String>newInstance()
+                .size(2).load(CacheLoads.dbJson("rdb.txt"))
+                .addRemoveListener(new MyRemoveListener<String,String>())
+                .build();
+        cache.put("1","1");
+    }
 }

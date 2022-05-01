@@ -1,5 +1,6 @@
 package com.ljx.myRedis.api;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,6 +55,11 @@ public interface ICache<K, V> extends Map<K, V> {
      */
     ICacheExpire<K, V> expire ();
 
+    /**
+     * 返回删除监听器列表
+     * @return 删除监听器类列表
+     */
+    List<ICacheRemoveListener<K,V>> removeListeners();
     /**
      * 加载信息
      * @return 加载信息
