@@ -66,4 +66,9 @@ public interface ICache<K, V> extends Map<K, V> {
      */
     ICacheLoad<K, V> load ();
 
+    /**
+     * 慢日志监听类列表
+     * @return 监听器列表
+     */
+    List<ICacheSlowListener> slowListeners();
 }

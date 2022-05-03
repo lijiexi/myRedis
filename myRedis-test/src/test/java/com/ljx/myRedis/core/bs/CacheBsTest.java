@@ -2,6 +2,7 @@ package com.ljx.myRedis.core.bs;
 
 import com.ljx.myRedis.api.ICache;
 import com.ljx.myRedis.core.listener.MyRemoveListener;
+import com.ljx.myRedis.core.listener.MySlowListener;
 import com.ljx.myRedis.core.load.MyCacheLoad;
 import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListener;
 import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListeners;
@@ -94,5 +95,15 @@ public class CacheBsTest {
                 .addRemoveListener(new MyRemoveListener<String,String>())
                 .build();
         cache.put("1","1");
+    }
+    /**
+     * 慢日志监听器测试
+     */
+    @Test
+    public void slowListenerTest () {
+        ICache<String,String> cache = CacheBs.<String,String>newInstance()
+                .size(3).addSlowListener(new MySlowListener()).build();
+        cache.put("1","1");
+        cache.get("1");
     }
 }

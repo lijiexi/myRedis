@@ -5,8 +5,11 @@ import com.ljx.myRedis.api.*;
 import com.ljx.myRedis.core.Cache;
 import com.ljx.myRedis.core.support.evict.CacheEvicts;
 import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListeners;
+import com.ljx.myRedis.core.support.listener.slow.CacheSlowListener;
+import com.ljx.myRedis.core.support.listener.slow.CacheSlowListeners;
 import com.ljx.myRedis.core.support.load.CacheLoads;
 import com.ljx.myRedis.core.support.persist.CachePersists;
+import com.ljx.myRedis.core.support.proxy.CacheProxy;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +48,10 @@ public class CacheBs<K, V> {
      * 默认使用默认删除监听器
      */
     private final List<ICacheRemoveListener<K,V>> removeListeners = CacheRemoveListeners.defaults();
+    /**
+     * 慢日志监听器类
+     */
+    private final List<ICacheSlowListener> slowListeners = CacheSlowListeners.none();
     /**
      * 加载策略 默认none
      */
@@ -101,6 +108,17 @@ public class CacheBs<K, V> {
         return this;
     }
     /**
+     * 添加慢日志监听器
+     * @param slowListener 监听器
+     * @return this
+     */
+    public CacheBs<K, V> addSlowListener(ICacheSlowListener slowListener) {
+        ArgUtil.notNull(slowListener, "slowListener");
+
+        this.slowListeners.add(slowListener);
+        return this;
+    }
+    /**
      * 设置持久化策略
      */
     public CacheBs<K,V> persist (ICachePersist<K,V> persist) {
@@ -118,9 +136,10 @@ public class CacheBs<K, V> {
         cache.removeListeners(removeListeners);
         cache.load(load);
         cache.persist(persist);
+        cache.slowListeners(slowListeners);
         //调用cache初始化，删除策略等
         cache.init();
-        return cache;
+        return CacheProxy.getProxy(cache);
 
     }
 }

@@ -37,6 +37,11 @@ public class Cache<K, V> implements ICache<K, V> {
     private List<ICacheRemoveListener<K,V>> removeListeners;
 
     /**
+     * 慢日志监听类
+     */
+    private List<ICacheSlowListener> slowListeners;
+
+    /**
      * 加载类
      */
     private ICacheLoad<K,V> load;
@@ -89,6 +94,16 @@ public class Cache<K, V> implements ICache<K, V> {
     }
     public Cache<K,V> removeListeners (List<ICacheRemoveListener<K,V>> removeListeners) {
         this.removeListeners = removeListeners;
+        return this;
+    }
+
+    @Override
+    public List<ICacheSlowListener> slowListeners() {
+        return slowListeners;
+    }
+
+    public Cache<K, V> slowListeners(List<ICacheSlowListener> slowListeners) {
+        this.slowListeners = slowListeners;
         return this;
     }
 
