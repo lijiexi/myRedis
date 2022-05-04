@@ -6,6 +6,7 @@ import com.ljx.myRedis.core.listener.MySlowListener;
 import com.ljx.myRedis.core.load.MyCacheLoad;
 import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListener;
 import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListeners;
+import com.ljx.myRedis.core.support.listener.slow.CacheSlowListeners;
 import com.ljx.myRedis.core.support.load.CacheLoads;
 import com.ljx.myRedis.core.support.persist.CachePersists;
 import org.junit.Assert;
@@ -102,8 +103,11 @@ public class CacheBsTest {
     @Test
     public void slowListenerTest () {
         ICache<String,String> cache = CacheBs.<String,String>newInstance()
-                .size(3).addSlowListener(new MySlowListener()).build();
+                .size(3).addSlowListener(new MySlowListener())
+                .addSlowListener(CacheSlowListeners.defaults()).build();
         cache.put("1","1");
         cache.get("1");
+        cache.get("2");
+        System.out.println(cache.entrySet());
     }
 }

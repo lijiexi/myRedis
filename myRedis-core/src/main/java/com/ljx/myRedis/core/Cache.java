@@ -1,6 +1,7 @@
 package com.ljx.myRedis.core;
 
 import com.github.houbb.heaven.util.lang.ObjectUtil;
+import com.ljx.myRedis.annotation.CacheInterceptor;
 import com.ljx.myRedis.api.*;
 import com.ljx.myRedis.core.constant.enums.CacheRemoveType;
 import com.ljx.myRedis.core.exception.CacheRuntimeException;
@@ -178,6 +179,7 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
+    @CacheInterceptor()
     public V get(Object key) {
         //惰性删除 刷新所有过期时间
         K genericKey = (K) key;
@@ -187,6 +189,7 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
+    @CacheInterceptor()
     public V put(K key, V value) {
         //1 尝试驱逐
         CacheEvictContext<K, V> context = new CacheEvictContext<>();
