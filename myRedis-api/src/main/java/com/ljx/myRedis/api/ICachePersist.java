@@ -1,7 +1,11 @@
 package com.ljx.myRedis.api;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 持久化缓存接口
+ * aof
+ * rdb
  */
 public interface ICachePersist<K, V> {
     /**
@@ -9,4 +13,22 @@ public interface ICachePersist<K, V> {
      * @param cache 缓存
      */
     void persist (final ICache<K,V> cache);
+
+    /**
+     * 延迟时间
+     * @return 延迟
+     */
+    long delay();
+
+    /**
+     * 时间间隔
+     * @return 间隔
+     */
+    long period();
+
+    /**
+     * 时间单位
+     * @return 时间单位
+     */
+    TimeUnit timeUnit();
 }

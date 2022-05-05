@@ -71,4 +71,10 @@ public interface ICache<K, V> extends Map<K, V> {
      * @return 监听器列表
      */
     List<ICacheSlowListener> slowListeners();
+
+    /**
+     * 持久化类
+     * @return 持久化类
+     */
+    ICachePersist<K,V> persist();
 }

@@ -1,7 +1,7 @@
 package com.ljx.myRedis.core.model;
 
 /**
- * rdb持久化明细
+ * rdb持久化对象明细
  */
 public class PersistRdbEntry<K, V> {
     /**

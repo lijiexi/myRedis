@@ -1,6 +1,7 @@
 package com.ljx.myRedis.core.support.interceptor;
 
 import com.ljx.myRedis.api.ICacheInterceptor;
+import com.ljx.myRedis.core.support.interceptor.aof.CacheInterceptorAof;
 import com.ljx.myRedis.core.support.interceptor.common.CacheInterceptorCost;
 
 import java.util.ArrayList;
@@ -18,5 +19,13 @@ public class CacheInterceptors {
         List<ICacheInterceptor> list = new ArrayList<>();
         list.add(new CacheInterceptorCost());
         return list;
+    }
+
+    /**
+     * AOF 模式
+     * @return aof拦截器
+     */
+    public static ICacheInterceptor aof () {
+        return new CacheInterceptorAof();
     }
 }

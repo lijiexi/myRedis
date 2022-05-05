@@ -26,4 +26,8 @@ public class CachePersists {
     public static <K,V> ICachePersist<K,V> dbJson (final String path) {
         return new CachePersistDbJson<>(path);
     }
+
+    public static <K,V> ICachePersist<K,V> aof (final String path) {
+        return new CachePersistAof<>(path);
+    }
 }

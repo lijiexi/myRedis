@@ -18,7 +18,25 @@ public class CacheLoads {
         return new CacheLoadNone<>();
     }
 
+    /**
+     * RDB加载
+     * @param path rdb文件路径
+     * @param <K>   key
+     * @param <V>   value
+     * @return
+     */
     public static <K,V> ICacheLoad<K,V> dbJson (final String path) {
         return new CacheLoadDbJson<>(path);
+    }
+
+    /**
+     * aof加载
+     * @param path 文件路径
+     * @param <K> key
+     * @param <V> value
+     * @return
+     */
+    public static <K,V> ICacheLoad<K,V> aof (final String path) {
+        return new CacheLoadAof<>(path);
     }
 }

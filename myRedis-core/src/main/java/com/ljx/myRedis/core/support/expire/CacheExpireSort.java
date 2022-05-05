@@ -153,6 +153,7 @@ public class CacheExpireSort<K, V> implements ICacheExpire<K, V> {
                 List<K> expireKeys = sortMap.get(expireTime);
                 expireKeys.remove(key);
                 sortMap.put(expireTime, expireKeys);
+                cache.remove(key);
             }
         }
     }

@@ -42,6 +42,6 @@ public class InnerCachePersist<K, V> {
             public void run() {
                 persist.persist(cache);
             }
-        },0,1, TimeUnit.MINUTES);
+        },persist.delay(),persist.period(), persist.timeUnit());
     }
 }

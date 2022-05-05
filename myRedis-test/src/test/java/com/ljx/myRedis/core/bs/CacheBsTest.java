@@ -110,4 +110,27 @@ public class CacheBsTest {
         cache.get("2");
         System.out.println(cache.entrySet());
     }
+    /**
+     * aof持久化测试
+     */
+    @Test
+    public void aofTest () throws InterruptedException {
+        ICache<String,String> cache = CacheBs.<String,String>newInstance()
+                .size(3).persist(CachePersists.aof("aof.txt")).build();
+        cache.put("1","1");
+        cache.put("2","2");
+        cache.put("3","3");
+        cache.expire("3",300);
+        TimeUnit.SECONDS.sleep(61);
+    }
+    /**
+     * aof加载测试
+     */
+    @Test
+    public void aofLoad () {
+        ICache<String,String> cache = CacheBs.<String,String>newInstance()
+                .size(3).load(CacheLoads.aof("aof.txt")).build();
+        System.out.println(cache.entrySet());
+    }
+
 }

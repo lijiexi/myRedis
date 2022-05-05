@@ -10,6 +10,7 @@ import com.sun.xml.internal.ws.util.StringUtils;
 import java.nio.file.StandardOpenOption;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 基于 json 的持久化
@@ -52,4 +53,18 @@ public class CachePersistDbJson<K, V> implements ICachePersist<K, V> {
         }
     }
 
+    @Override
+    public long delay() {
+        return 5;
+    }
+
+    @Override
+    public long period() {
+        return 5;
+    }
+
+    @Override
+    public TimeUnit timeUnit() {
+        return TimeUnit.MINUTES;
+    }
 }

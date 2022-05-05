@@ -23,4 +23,12 @@ public @interface CacheInterceptor {
      * 默认关闭
      */
     boolean refresh() default false;
+
+    /**
+     * 该操作是否需要append to file
+     * 针对 cache 内容有变更的操作，不包括查询操作。
+     * 删除、添加、过期操作
+     * @return 是否开启aof
+     */
+    boolean aof() default false;
 }

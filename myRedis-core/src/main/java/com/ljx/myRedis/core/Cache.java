@@ -7,9 +7,11 @@ import com.ljx.myRedis.core.constant.enums.CacheRemoveType;
 import com.ljx.myRedis.core.exception.CacheRuntimeException;
 import com.ljx.myRedis.core.support.evict.CacheEvictContext;
 import com.ljx.myRedis.core.support.expire.CacheExpire;
+import com.ljx.myRedis.core.support.expire.CacheExpireSort;
 import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListener;
 import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListenerContext;
 import com.ljx.myRedis.core.support.persist.InnerCachePersist;
+import com.ljx.myRedis.core.support.proxy.CacheProxy;
 
 import java.util.*;
 
@@ -79,6 +81,16 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     /**
+     * 获取持久化类
+     * @return 持久化类
+     */
+    @Override
+    public ICachePersist<K, V> persist() {
+        return persist;
+    }
+
+
+    /**
      * 设置持久化策略
      */
     public void persist (ICachePersist<K,V> persist) {
@@ -121,6 +133,7 @@ public class Cache<K, V> implements ICache<K, V> {
      */
     public void init () {
         this.expire = new CacheExpire<>(this);
+        //this.expire = new CacheExpireSort<>(this);
         //进行加载策略load
         this.load.load(this);
         //初始化持久策略，每10分钟进行一侧
@@ -134,9 +147,13 @@ public class Cache<K, V> implements ICache<K, V> {
      * @param timeInMills timeInMills毫秒后过期
      * @return this
      */
+    @CacheInterceptor
     public ICache<K, V> expire (final K key, final long timeInMills) {
         long expireTime = System.currentTimeMillis() + timeInMills;
-        return expireAt(key, expireTime);
+
+        //使用代理调用，此时不需要开启本方法aof
+        Cache<K,V> cacheProxy = (Cache<K, V>) CacheProxy.getProxy(this);
+        return cacheProxy.expireAt(key, expireTime);
     }
 
     /**
@@ -145,6 +162,7 @@ public class Cache<K, V> implements ICache<K, V> {
      * @param timeInMills 时间戳
      * @return
      */
+    @CacheInterceptor(aof = true)
     public ICache<K, V> expireAt (final K key, final long timeInMills) {
         this.expire.expire(key,timeInMills);
         return this;
@@ -189,7 +207,7 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
-    @CacheInterceptor()
+    @CacheInterceptor(aof = true)
     public V put(K key, V value) {
         //1 尝试驱逐
         CacheEvictContext<K, V> context = new CacheEvictContext<>();
@@ -223,16 +241,19 @@ public class Cache<K, V> implements ICache<K, V> {
         return currentSize >= this.sizeLimit;
     }
     @Override
+    @CacheInterceptor(aof = true)
     public V remove(Object key) {
         return map.remove(key);
     }
 
     @Override
+    @CacheInterceptor(aof = true)
     public void putAll(Map<? extends K, ? extends V> m) {
         map.putAll(m);
     }
 
     @Override
+    @CacheInterceptor(aof = true)
     public void clear() {
         map.clear();
     }
