@@ -4,6 +4,7 @@ import com.ljx.myRedis.api.ICache;
 import com.ljx.myRedis.core.listener.MyRemoveListener;
 import com.ljx.myRedis.core.listener.MySlowListener;
 import com.ljx.myRedis.core.load.MyCacheLoad;
+import com.ljx.myRedis.core.support.evict.CacheEvicts;
 import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListener;
 import com.ljx.myRedis.core.support.listener.remove.CacheRemoveListeners;
 import com.ljx.myRedis.core.support.listener.slow.CacheSlowListeners;
@@ -130,6 +131,26 @@ public class CacheBsTest {
     public void aofLoad () {
         ICache<String,String> cache = CacheBs.<String,String>newInstance()
                 .size(3).load(CacheLoads.aof("aof.txt")).build();
+        System.out.println(cache.entrySet());
+    }
+    /**
+     * LRU淘汰策略测试
+     */
+    @Test
+    public void lruTest() {
+        ICache<String,String> cache = CacheBs.<String,String>newInstance()
+                .size(3).evict(CacheEvicts.lru()).build();
+        cache.put("A", "hello");
+        cache.put("B", "world");
+        cache.put("C", "FIFO");
+
+        // 访问一次A
+        cache.get("A");
+        cache.put("D", "LRU");
+        cache.get("A");
+        cache.put("e", "LRU");
+        cache.put("f", "LRU");
+
         System.out.println(cache.entrySet());
     }
 

@@ -31,4 +31,11 @@ public @interface CacheInterceptor {
      * @return 是否开启aof
      */
     boolean aof() default false;
+
+    /**
+     * 是否执行驱逐更新
+     * 用户LRU/LFU驱逐策略
+     * @return
+     */
+    boolean evict() default false;
 }

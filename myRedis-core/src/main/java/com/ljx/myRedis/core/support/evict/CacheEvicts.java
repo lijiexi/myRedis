@@ -14,12 +14,19 @@ public final class CacheEvicts {
      * 无策略
      */
 //    public static <K, V> ICacheEvict<K, V> none () {
-//        return new CacheEvictFifo<>();
+//        return new CacheEvict<>();
 //    }
     /**
      * 先进先出策略
      */
     public static <K, V> ICacheEvict<K, V> fifo () {
         return new CacheEvictFifo<>();
+    }
+    /**
+     * LRU驱逐策略
+     * 基于LinkedList实现
+     */
+    public static <K,V> ICacheEvict<K,V> lru () {
+        return new CacheEvictLru<>();
     }
 }

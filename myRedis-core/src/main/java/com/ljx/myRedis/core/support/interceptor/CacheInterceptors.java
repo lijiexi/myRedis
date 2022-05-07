@@ -3,6 +3,7 @@ package com.ljx.myRedis.core.support.interceptor;
 import com.ljx.myRedis.api.ICacheInterceptor;
 import com.ljx.myRedis.core.support.interceptor.aof.CacheInterceptorAof;
 import com.ljx.myRedis.core.support.interceptor.common.CacheInterceptorCost;
+import com.ljx.myRedis.core.support.interceptor.evict.CacheInterceptorEvict;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,5 +28,12 @@ public class CacheInterceptors {
      */
     public static ICacheInterceptor aof () {
         return new CacheInterceptorAof();
+    }
+
+    /**
+     * 驱逐策略拦截器
+     */
+    public static ICacheInterceptor evict () {
+        return new CacheInterceptorEvict();
     }
 }

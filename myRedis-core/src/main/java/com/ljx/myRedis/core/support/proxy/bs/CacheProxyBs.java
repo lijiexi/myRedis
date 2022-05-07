@@ -27,8 +27,11 @@ public class CacheProxyBs {
      * 包括慢日志和时间消耗
      */
     private final List<ICacheInterceptor> commonInterceptors = CacheInterceptors.defaultCommonList();
-
+    /**
+     * 持久化拦截器
+     */
     private final ICacheInterceptor persistInterceptors = CacheInterceptors.aof();
+    private final ICacheInterceptor evictInterceptors = CacheInterceptors.evict();
     public static CacheProxyBs newInstance() {
         return new CacheProxyBs();
     }
@@ -98,6 +101,14 @@ public class CacheProxyBs {
                     persistInterceptors.before(interceptorContext);
                 } else {
                     persistInterceptors.after(interceptorContext);
+                }
+            }
+            //3.驱逐策略更新
+            if (cacheInterceptor.evict()) {
+                if(before) {
+                    evictInterceptors.before(interceptorContext);
+                } else {
+                    evictInterceptors.after(interceptorContext);
                 }
             }
         }
