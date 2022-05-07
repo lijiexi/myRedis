@@ -1,6 +1,7 @@
 package com.ljx.myRedis.core.bs;
 
 import com.ljx.myRedis.api.ICache;
+import com.ljx.myRedis.core.Cache;
 import com.ljx.myRedis.core.listener.MyRemoveListener;
 import com.ljx.myRedis.core.listener.MySlowListener;
 import com.ljx.myRedis.core.load.MyCacheLoad;
@@ -97,6 +98,10 @@ public class CacheBsTest {
                 .addRemoveListener(new MyRemoveListener<String,String>())
                 .build();
         cache.put("1","1");
+        cache.put("2","1");
+        cache.put("3","1");
+        cache.remove("1");
+        System.out.println(cache.entrySet());
     }
     /**
      * 慢日志监听器测试
@@ -154,4 +159,23 @@ public class CacheBsTest {
         System.out.println(cache.entrySet());
     }
 
+    /**
+     * 测试基于双向链表+Map的Lru实现
+     */
+    @Test
+    public void doubleListLru () {
+        ICache<String,String> cache = CacheBs.<String,String>newInstance()
+                .size(2).evict(CacheEvicts.lruDoubleListMap())
+                        .build();
+
+        cache.put("A", "hello");
+        cache.put("B", "world");
+        // 访问一次A
+        cache.get("A");
+        cache.put("C", "FIFO");
+        cache.put("D", "FIFO");
+        cache.remove("A");
+        cache.remove("C");
+        System.out.println(cache.entrySet());
+    }
 }
