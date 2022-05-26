@@ -33,7 +33,7 @@ public class CachePersistAof<K,V> extends CachePersistAdaptor<K,V> {
 
     @Override
     public void persist(ICache<K, V> cache) {
-        log.info("开始AOF持久化到文件");
+        //log.info("开始AOF持久化到文件");
         //1.创建文件
         if (!FileUtil.exists(dbPath)) {
             FileUtil.createFile(dbPath);
@@ -47,12 +47,12 @@ public class CachePersistAof<K,V> extends CachePersistAdaptor<K,V> {
 
     @Override
     public long delay() {
-        return 1;
+        return 10;
     }
 
     @Override
     public long period() {
-        return 1;
+        return 10;
     }
 
     @Override

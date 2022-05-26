@@ -37,6 +37,8 @@ public class CacheInterceptorAof<K,V> implements ICacheInterceptor<K,V> {
             //进行持久化
             log.debug("AOF 开始追加文件内容：{}", json);
             cachePersistAof.append(json);
+            //线上环境使用
+            cachePersistAof.persist(cache);
             log.debug("AOF 完成追加文件内容：{}", json);
         }
     }

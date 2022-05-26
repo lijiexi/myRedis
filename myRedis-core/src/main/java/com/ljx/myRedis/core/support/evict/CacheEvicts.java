@@ -39,4 +39,15 @@ public final class CacheEvicts {
     public static <K,V> ICacheEvict<K,V> lruDoubleListMap () {
         return new CacheEvictLruDoubleListMap<>();
     }
+    /**
+     * LRU 驱除策略
+     *
+     * 基于 LRU-2 实现
+     * @param <K> key
+     * @param <V> value
+     * @return 结果
+     */
+    public static <K, V> ICacheEvict<K, V> lru2() {
+        return new CacheEvictLru2<>();
+    }
 }

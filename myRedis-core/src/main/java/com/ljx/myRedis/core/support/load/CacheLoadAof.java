@@ -58,6 +58,9 @@ public class CacheLoadAof<K,V> implements ICacheLoad<K,V> {
 
     @Override
     public void load(ICache<K, V> cache) {
+        if (FileUtil.notExists(dbPath)) {
+            return;
+        }
         List<String> lines = FileUtil.readAllLines(dbPath);
         log.info("[aof加载] 开始处理 path: {}", dbPath);
         if(CollectionUtil.isEmpty(lines)) {

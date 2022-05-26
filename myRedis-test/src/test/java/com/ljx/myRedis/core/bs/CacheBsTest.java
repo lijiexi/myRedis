@@ -178,4 +178,26 @@ public class CacheBsTest {
         cache.remove("C");
         System.out.println(cache.entrySet());
     }
+
+    /**
+     * 测试基于lruMap的lru-2算法实现
+     */
+    @Test
+    public void lru2 () {
+        ICache<String, String> cache = CacheBs.<String,String>newInstance()
+                .size(3)
+                .evict(CacheEvicts.lru2())
+                .build();
+        cache.put("A", "hello");
+        cache.put("B", "world");
+        cache.put("C", "FIFO");
+        // 访问一次A
+        cache.get("A");
+        cache.put("D", "LRU");
+        cache.put("E", "LRU");
+        cache.put("F", "LRU");
+        cache.put("G", "LRU");
+        Assert.assertEquals(3, cache.size());
+        System.out.println(cache.keySet());
+    }
 }
