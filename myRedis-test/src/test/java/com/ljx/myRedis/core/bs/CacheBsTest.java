@@ -25,14 +25,14 @@ public class CacheBsTest {
      */
     @Test
     public void helloTest () {
-        ICache<String,String> cache = CacheBs.<String,String>newInstance().size(3).build();
+        ICache<String,String> cache = CacheBs.<String,String>newInstance()
+                .size(2)
+                .build();
         cache.put("1","1");
         cache.put("2","2");
         cache.put("3","3");
-        cache.put("4","4");
-        cache.put("5","5");
-        cache.put("6","6");
         System.out.println(cache.keySet());
+        Assert.assertEquals(2, cache.size());
     }
     /**
      * 过期测试
